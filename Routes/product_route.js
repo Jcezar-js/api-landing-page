@@ -16,8 +16,11 @@ router.get ('/', async (req, res) => {
 //ROTA PARA OBTER PRODUTO PELO ID
 router.get('/:id', async (req, res) => {
   try {
-    const products = await Product.findById(req.body.id);
-    res.json(products);
+    const product = await Product.findById(req.params.id);
+    if (product == null){
+      return res.status(404).json({message: 'Produto não encontrado'});
+    }
+    res.json(product);
   }catch (err) {
     res.status(500).json({ message: err.message });
 }
@@ -25,11 +28,19 @@ router.get('/:id', async (req, res) => {
 
 // Rota para criar um novo produto
 router.post('/', async (req, res) => {
+// Desestruturar garante que você pegue apenas os campos necessários
+const {name, description, price, photos, isFeatured} = req.body
+
+if (!name || !description || !price == null) {
+  return res.status(400).json({message: 'Nome, descrição e preço são obrigatórios.'});
+}
   // Cria um novo objeto Product com os dados do 'body' da requisição
   const product = new Product({
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price
+    name: name,
+    description:description,
+    price: price,
+    photos: photos || [],
+    isFeatured: isFeatured || false, 
   });
 
   try {
