@@ -1,9 +1,8 @@
 require('dotenv').config()
 
-const express = require('express')
+import express from 'express'
 const app = express()
-const mongoose = require('mongoose')
-
+import mongoose from 'mongoose'
 const DB_URL = process.env.DATABASE_URL
 const PORT = process.env.PORT || 3001
 
