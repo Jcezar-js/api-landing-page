@@ -3,11 +3,21 @@ import Product from '../models/product_schema';
 import {z} from 'zod';
 
 const productSchema = z.object({
-  name: z.string({ error : "O nome é obrigatório"}).min(3, 'O nome deve conter pelo menos 3 caracteres'),
-  description: z.string().min(1, 'A descrição é obrigatória'),
-  price: z.number().nonnegative('O preço deve ser um número positivo'),
-  photos: z.array(z.string().url()).optional(),
-  isFeatured: z.boolean().optional()
+  name: z
+    .string({ error : "O nome é obrigatório"})
+    .min(3, 'O nome deve conter pelo menos 3 caracteres'),
+  description: z
+    .string()
+    .min(1, 'A descrição é obrigatória'),
+  price: z
+    .number()
+    .nonnegative('O preço deve ser um número positivo'),
+  photos: z
+    .array(z.string().url())
+    .optional(),
+  isFeatured: z
+    .boolean()
+    .optional()
 })
 
 // Get all products
