@@ -15,7 +15,7 @@ const createAdmin = async () => {
     await mongoose.connect(DB_URL);
     console.log('Conectado ao MongoDB');
     
-    const adminEmail = 'julio.filho1@hotmail.com';
+    const adminEmail = 'admin@admin.com.br';
     const userExists = await User.findOne ({ email: adminEmail });
 
     if (userExists){
@@ -26,7 +26,7 @@ const createAdmin = async () => {
   const newAdmin = new User ({
     name: 'Admin',
     email: adminEmail,
-    password: 'Mad@2026'
+    password: '123123'
   });
 
   await newAdmin.save();
