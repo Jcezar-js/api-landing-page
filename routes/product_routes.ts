@@ -6,14 +6,15 @@ import {
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getProductQuote
 } from '../controllers/product_controller'
 
 const router = express.Router();
 //Rotas de produto públicas
 router.get('/', getAllProducts);
 router.get('/:id', getProductById);
-
+router.post('/quote/:id', getProductQuote);
 //Rotas protegidas
 router.post('/', authMiddleware, upload.array('photos',5),createProduct);
 router.patch('/:id', authMiddleware, upload.array('photos',5),updateProduct);

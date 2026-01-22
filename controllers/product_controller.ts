@@ -1,5 +1,6 @@
 import {Request, Response} from 'express';
 import Product from '../models/product_schema';
+import { calculateProductPrice } from './pricing_service';
 import {z} from 'zod';
 
 const productSchema = z.object({
@@ -109,3 +110,31 @@ export const deleteProduct = async (req: Request, res: Response) => {
       res.status(500).json({ message: err.message });
     }
   }
+
+
+  export const getProductQuote = async (req: Request, res: Response) => {
+    const productId = req.params.id;
+
+    //zod para validar dimensões enviadas pelo cliente
+
+    const dimensionsSchema = z.object({
+      height: z.coerce.number().positive('A altura deve ser um número positivo'),
+      width: z.coerce.number().positive('A largura deve ser um número positivo'),
+      depth: z.coerce.number().positive('A profundidade deve ser um número positivo'),
+    });
+
+    const validation = dimensionsSchema.safeParse(req.body);
+    if (!validation.success){
+      return res.status(400).json({ errors: validation.error.issues });
+    }
+
+    try {
+      const quote = await calculateProductPrice(productId, validation.data);
+      res.json(quote);
+    } catch (err:any) {
+      res.status(400).json({ message: err.message }); 
+    }
+
+  };
+
+  
