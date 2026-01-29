@@ -15,7 +15,7 @@ if (!DB_URL){
   process.exit(1);
 }
 
-
+//conexão com banco de dados
 mongoose.connect(DB_URL);
 const db = mongoose.connection;
 db.on('error', (error) => console.error('Erro ao conectar ao banco: ', error));
@@ -25,7 +25,9 @@ app.use(express.json())
 
 // Usar as rotas de produtos
 app.use('/api/products', productsRouter);
+//usar as rotas de autenticação
 app.use('/api/auth', auth_router);
+//usar as rotas de materiais
 app.use('/api/materials', materialrouter);
 
 app.listen(PORT,()=>console.log('Server iniciado na porta', PORT));
