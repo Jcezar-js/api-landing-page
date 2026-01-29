@@ -2,7 +2,7 @@ import express from 'express';
 import {authMiddleware} from '../middlewares/auth_middleware';
 import { 
   login,
-  updatePassword
+  update_password
 } from '../controllers/auth_controller';
 
 const auth_router = express.Router();
@@ -10,7 +10,7 @@ const auth_router = express.Router();
 auth_router.post('/login', login);
 
 //Rotas protegidas
-auth_router.patch('/updatepsw', authMiddleware, updatePassword);
+auth_router.patch('/updatepsw', authMiddleware, update_password);
 
 
 

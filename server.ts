@@ -2,9 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 import mongoose from 'mongoose';
-import productsRouter from './routes/product_routes';
+import products_router from './routes/product_routes';
 import auth_router from './routes/auth_routes';
-import materialrouter from './routes/material_routes';
+import material_router from './routes/material_routes';
 
 const app = express();
 const DB_URL = process.env.DATABASE_URL;
@@ -24,10 +24,10 @@ db.once('open', () => console.log('Conectado ao MongoDB'));
 app.use(express.json())
 
 // Usar as rotas de produtos
-app.use('/api/products', productsRouter);
+app.use('/api/products', products_router);
 //usar as rotas de autenticação
 app.use('/api/auth', auth_router);
 //usar as rotas de materiais
-app.use('/api/materials', materialrouter);
+app.use('/api/materials', material_router);
 
 app.listen(PORT,()=>console.log('Server iniciado na porta', PORT));
