@@ -41,7 +41,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   const { email, password } = req.body;
   
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ $eq: { email } });
     if (!user) {
       return next(new app_error_class('Email ou senha incorretos!', 401));
     }

@@ -7,11 +7,13 @@ import {
   update_material,
   delete_material
 } from '../controllers/material_controller';
-
+import { rate_limiter } from '../middlewares/rate_limiting';
 
 const material_router = express.Router();
 
+
 material_router.use(auth_middleware);
+material_router.use(rate_limiter);
 
 material_router.post('/', create_material);
 material_router.get('/', get_all_materials);
