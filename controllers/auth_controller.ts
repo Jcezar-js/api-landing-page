@@ -3,10 +3,10 @@ import User from '../models/user_schema';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {z} from 'zod';
-import { appError } from '../middlewares/error_handling_middleware';
+import { app_error_class } from '../middlewares/error_handling_middleware';
 
 
-//user validation schema
+//user validation schema zod
 const userSchema = z.object({
   name: z
     .string({ error : "O nome é obrigatório"})
@@ -37,64 +37,63 @@ const updatePasswordSchema = z
 
 
 //login user
-export const login = async (req: Request, res: Response, next: NextFunction)=> {
-
-  const {email, password} = req.body;
-  try{
-    const user = await User.findOne({email});
-    if(!user){
-      return next(new appError('Email ou senha incorretos!', 401));
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return next(new app_error_class('Email ou senha incorretos!', 401));
     }
+    
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if(!isPasswordValid){
-      return res.status(401).json({message: ' Email ou senha incorretos! '});
+    if (!isPasswordValid) {
+      return next(new app_error_class('Email ou senha incorretos!', 401));
     }
 
     const secret = process.env.JWT_SECRET;
-    if(!secret) throw new Error('JWT_SECRET não está deinido');
+    if (!secret) {
+      return next(new app_error_class('JWT_SECRET não está definido', 422));
+    }
 
     const token = jwt.sign(
-      {id: user._id, role: 'user'},
+      { id: user._id, role: 'user' },
       secret,
-      {expiresIn: '1d'}
+      { expiresIn: '1d' }
     );
 
-    return res.json ({ token, userId: user._id});
-  
-  } catch (err: any){
-    return res.status(500).json({message: 'Erro interno no servidor'});
+    return res.json({ token, userId: user._id });
+  } catch (err) {
+    return next(err); // Passa para o error handler global
   }
 };
 
-export const update_password = async (req: Request, res: Response) => {
-  const result =  updatePasswordSchema.safeParse(req.body);
+export const update_password = async (req: Request, res: Response, next: NextFunction) => {
+  const result = updatePasswordSchema.safeParse(req.body);
 
-  if (!result.success){
-    return res.status(400).json({errors: result.error.issues});
+  if (!result.success) {
+    return next (new app_error_class('Dados inválidos', 400));
   }
 
-  const {currentPassword, password } = result.data;
+  const { currentPassword, password } = result.data;
   const userId = (req as any).userId;
 
-
-  try{
+  try {
     const user = await User.findById(userId);
-    if(!user){
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+    if (!user) {
+      return next(new app_error_class('Usuário não encontrado', 404));
     }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.status(401).json({message: 'Sua senha atual está incorreta'});
+      return next(new app_error_class('As senhas não coincidem', 400));
     }
-  user.password = password;
-  await user.save();
+    
+    user.password = password;
+    await user.save();
 
-  res.json({ message: 'Senha alterada com sucesso!' });
-  } catch (err: any){
-    res.status (500).json({message: err.message});
+    res.json({ message: 'Senha alterada com sucesso!' });
+  } catch (err) {
+    return next(err);
   }
-
- 
-
-}
+};

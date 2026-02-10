@@ -1,5 +1,6 @@
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 import Material from '../models/material_schema';
+import { app_error_class } from '../middlewares/error_handling_middleware';
 import {z} from 'zod';
 
 const materialSchemaValidator = z.object({
@@ -18,68 +19,68 @@ const materialSchemaValidator = z.object({
 
 });
 
-export const create_material = async (req: Request, res: Response) => {
+export const get_all_materials = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const materials = await Material.find();
+    res.json(materials);
+  } catch (err: any) {
+    return next(err);
+  }
+};
+
+export const get_material_by_id = async (req:Request, res:Response, next: NextFunction) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (material == null){
+      return next (new app_error_class('Material não encontrado', 404))
+    }
+    res.json(material);
+  } catch (err: any) {
+    return next (err);
+  }
+};
+
+export const create_material = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validation = materialSchemaValidator.safeParse(req.body);
     if (!validation.success) {
-      return res.status(400).json({ errors: validation.error.issues });
+      return next (new app_error_class('Dados inválidos no material', 400))
     }
 
     const material = new Material(validation.data);
     await material.save();
     res.status(201).json(material);
   } catch (err: any){
-    res.status(500).json({ message: err.message });
+    return next(err);
   }
 };
 
-export const get_all_materials = async (req: Request, res: Response) => {
-  try {
-    const materials = await Material.find();
-    res.json(materials);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-export const get_material_by_id = async (req:Request, res:Response) => {
-  try {
-    const material = await Material.findById(req.params.id);
-    if (material == null){
-      return res.status(404).json({message: 'Material não encontrado'});
-    }
-    res.json(material);
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-export const update_material = async (req:Request, res:Response) => {
+export const update_material = async (req:Request, res:Response, next: NextFunction) => {
   try {
     const validation = materialSchemaValidator.partial().safeParse(req.body);
     if (!validation.success) {
-      return res.status(400).json({ errors: validation.error.issues });
+      return next (new app_error_class('Dados inválidos no material', 400));
     }
 
     const material = await Material.findByIdAndUpdate(req.params.id, validation.data, { new: true });
     if (material == null){
-      return res.status(404).json({message: 'Material não encontrado'});
+      return next (new app_error_class('Material não encontrado', 404))
     }
     res.json(material);
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    return next (err);
   }
 };
 
-  export const delete_material = async (req:Request, res:Response) => {
+  export const delete_material = async (req:Request, res:Response, next:NextFunction) => {
   try {
     const material = await Material.findByIdAndDelete(req.params.id);
     if (material == null){
-      return res.status(404).json({message: 'Material não encontrado'});
+      return next (new app_error_class('Material não encontrado', 404));
     }
     res.json({message: 'Material deletado com sucesso'});
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    return next (err);
   }
 };
 

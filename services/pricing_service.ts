@@ -7,6 +7,8 @@ interface Dimensions {
   depth: number;
 }
 
+//calcula o preço de um produto com base nas dimensões e materiais
+
 export const calculateProductPrice = async (productId: string, dimensions: Dimensions) => {
   // Busca o produto com os materiais populados
   const product = await Product.findById(productId).populate('components.material');
@@ -23,6 +25,7 @@ export const calculateProductPrice = async (productId: string, dimensions: Dimen
     throw new Error(`Profundidade inválida. Mínimo: ${product.constraints.minDepth}, Máximo: ${product.constraints.maxDepth}`);
   };
 
+  //calcula o custo dos materiais
   let totalMaterialCost = 0;
   const area = dimensions.height * dimensions.width / 1000000; // área em m2
   const perimeter = 2 * (dimensions.height + dimensions.width) / 1000; // perímetro em metros

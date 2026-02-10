@@ -1,5 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
 import jwt from 'jsonwebtoken';
+import { app_error_class } from './error_handling_middleware';
 
 
 export interface AuthRequest extends Request {
@@ -9,19 +10,19 @@ export interface AuthRequest extends Request {
 export const auth_middleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if(!authHeader){
-    return res.status(401).json({message: 'Token de autenticação não fornecido'});
+    return next (new app_error_class('Token de autenticação não fornecido', 401));
   }
 
   const parts = authHeader.split(' ');
 
   if(parts.length !== 2){
-    return res.status(401).json({message: 'Erro no formato do token'});
+    return next (new app_error_class('Erro no formato do token', 401));
   }
 
   const [scheme, token] = parts;
 
   if(!/^Bearer$/i.test(scheme)){
-    return res.status(401).json({message: 'Token mal formatado'});
+    return next (new app_error_class('Token mal formatado', 401));
   }
 
   try{
@@ -32,6 +33,6 @@ export const auth_middleware = (req: AuthRequest, res: Response, next: NextFunct
 
     return next();
   } catch (err){
-    return res.status(401).json({message: 'Token inválido'});
+    return next (new app_error_class('Token inválido', 401));
   }
 };

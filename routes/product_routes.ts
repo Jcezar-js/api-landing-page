@@ -10,16 +10,16 @@ import {
   get_product_quote
 } from '../controllers/product_controller'
 
-const router = express.Router();
+const products_router = express.Router();
 //Rotas de produto públicas
-router.get('/', get_all_products);
-router.get('/:id', get_product_by_id);
-router.post('/quote/:id', get_product_quote);
+products_router.get('/', get_all_products);
+products_router.get('/:id', get_product_by_id);
+products_router.post('/quote/:id', get_product_quote);
 //Rotas protegidas
-router.post('/', auth_middleware, upload.array('photos',5),create_product);
-router.patch('/:id', auth_middleware, upload.array('photos',5),update_product);
-router.delete('/:id', auth_middleware, delete_product);
+products_router.post('/', auth_middleware, upload.array('photos',5),create_product);
+products_router.patch('/:id', auth_middleware, upload.array('photos',5),update_product);
+products_router.delete('/:id', auth_middleware, delete_product);
 
 
 
-export default router;
+export default products_router;

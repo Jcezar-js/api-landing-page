@@ -9,14 +9,14 @@ import {
 } from '../controllers/material_controller';
 
 
-const router = express.Router();
+const material_router = express.Router();
 
-router.use(auth_middleware);
+material_router.use(auth_middleware);
 
-router.post('/', create_material);
-router.get('/', get_all_materials);
-router.get('/:id', get_material_by_id);
-router.patch('/:id', update_material);
-router.delete('/:id', delete_material);
+material_router.post('/', create_material);
+material_router.get('/', get_all_materials);
+material_router.get('/:id', get_material_by_id);
+material_router.patch('/:id', update_material);
+material_router.delete('/:id', delete_material);
 
-export default router;
+export default material_router;

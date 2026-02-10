@@ -3,13 +3,13 @@ import {Request, Response, NextFunction} from 'express';
 
 //global error handling middleware
 //custom error class
-export class appError extends Error {
+export class app_error_class extends Error {
   statusCode:  number;
   isOperational: boolean;
 
-  constructor (message:string , statusCode: number) {
+  constructor (message:string , status_code: number) {
     super(message);
-    this.statusCode = statusCode;
+    this.statusCode = status_code;
     this.isOperational = true;
     Error.captureStackTrace(this, this.constructor);
   }
@@ -17,7 +17,7 @@ export class appError extends Error {
 
 
 export const error_handling_middleware = (
-  err: appError | Error, 
+  err: app_error_class | Error, 
   req: Request, 
   res: Response, 
   next: NextFunction
@@ -27,7 +27,7 @@ export const error_handling_middleware = (
     console.error(err.stack);
   }
 
-  if (err instanceof appError) {
+  if (err instanceof app_error_class) {
     return res.status(err.statusCode).json({
       success: false,
       message: err.message,
@@ -42,11 +42,11 @@ export const error_handling_middleware = (
   if (err.name === 'MongoServerError' && (err as any).code === 11000) {
     return res.status(409).json({
       success: false,
-      message: 'Registro duplicado',
+      message: 'Registro duplicado no banco de dados',
     });
   }
   return res.status(500).json({
     success: false,
-    message: 'Erro interno do servidor',
+    message: 'Erro interno do servidor ',
   });
 }
