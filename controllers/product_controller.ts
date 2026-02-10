@@ -124,11 +124,17 @@ export const create_product = async (req: Request, res: Response, next: NextFunc
 //Update an existing product
 export const update_product = async (req: Request, res: Response, next: NextFunction) => {
   try{
+    //Valida os dados contra o schema
+    const validation = productSchema.partial().safeParse(req.body);
+    if (!validation.success) {
+      return next(new app_error_class('Dados inválidos no produto', 400));
+    }
+
     //Valida ID busca e atualiza em tempo real 
     // O { new: true } diz ao Mongoose para retornar o objeto JÁ atualizado, não o antigo.
     const updateProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      {$set: validation.data},
       {new: true, runValidators: true} // runValidators garante que as regras do Schema (ex: min length) sejam respeitadas
     );
     if (updateProduct == null){

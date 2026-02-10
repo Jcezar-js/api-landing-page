@@ -4,8 +4,14 @@ import {
   login,
   update_password
 } from '../controllers/auth_controller';
+import { rate_limiter } from '../middlewares/rate_limiting';
+
 
 const auth_router = express.Router();
+const app = express();
+
+app.use(rate_limiter);
+
 //Rotas de produto públicas
 auth_router.post('/login', login);
 

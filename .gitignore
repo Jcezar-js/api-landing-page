@@ -3,4 +3,5 @@ node_modules
 .cursor/rules
 .cursor/workspace.code-workspace
 .cursor/rules/Rebuilt.mdc
+.CHANGELOG.md
 
