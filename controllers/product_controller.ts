@@ -96,8 +96,14 @@ export const create_product = async (req: Request, res: Response, next: NextFunc
 
   const resultado = productSchema.safeParse(dataToValidate);
   if (!resultado.success) {
-    return next(new app_error_class('Dados inválidos no produto', 400));
-  }
+    const flatenned = resultado.error.flatten();
+      return res.status(400).json({
+        success: false,
+        message: 'Dados inválidos para criação de material',
+        errors: flatenned.fieldErrors
+      });
+    }
+
   
   const {name, description, photos, isFeatured} = resultado.data;
   const product = new Product({
@@ -127,9 +133,14 @@ export const update_product = async (req: Request, res: Response, next: NextFunc
     //Valida os dados contra o schema
     const validation = productSchema.partial().safeParse(req.body);
     if (!validation.success) {
-      return next(new app_error_class('Dados inválidos no produto', 400));
+      const flatenned = validation.error.flatten();
+      return res.status(400).json({
+        success: false,
+        message: 'Dados inválidos para atualização de produto',
+        errors: flatenned.fieldErrors
+      });
     }
-
+  
     //Valida ID busca e atualiza em tempo real 
     // O { new: true } diz ao Mongoose para retornar o objeto JÁ atualizado, não o antigo.
     const updateProduct = await Product.findByIdAndUpdate(

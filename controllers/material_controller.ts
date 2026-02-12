@@ -44,7 +44,12 @@ export const create_material = async (req: Request, res: Response, next: NextFun
   try {
     const validation = materialSchemaValidator.safeParse(req.body);
     if (!validation.success) {
-      return next (new app_error_class('Dados inválidos no material', 400))
+      const flatenned = validation.error.flatten();
+      return res.status(400).json({
+        success: false,
+        message: 'Dados inválidos para criação de material',
+        errors: flatenned.fieldErrors
+      });
     }
 
     const material = new Material(validation.data);
@@ -59,7 +64,12 @@ export const update_material = async (req:Request, res:Response, next: NextFunct
   try {
     const validation = materialSchemaValidator.partial().safeParse(req.body);
     if (!validation.success) {
-      return next (new app_error_class('Dados inválidos no material', 400));
+      const flatenned = validation.error.flatten();
+      return res.status(400).json({
+        success: false,
+        message: 'Dados inválidos para atualização de material',
+        errors: flatenned.fieldErrors
+      });
     }
 
     const material = await Material.findByIdAndUpdate(req.params.id, validation.data, { new: true });

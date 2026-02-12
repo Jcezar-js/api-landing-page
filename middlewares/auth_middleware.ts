@@ -7,7 +7,7 @@ export interface AuthRequest extends Request {
   userId?: string;
 }
 
-export const auth_middleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const auth_middleware = (req: AuthRequest, res:Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if(!authHeader){
     return next (new app_error_class('Token de autenticação não fornecido', 401));

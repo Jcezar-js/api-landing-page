@@ -1,5 +1,7 @@
 import Product from '../models/product_schema';
 import Material from '../models/material_schema';
+import { NextFunction } from 'express';
+import { app_error_class } from '../middlewares/error_handling_middleware';
 
 interface Dimensions {
   height: number;
@@ -9,20 +11,20 @@ interface Dimensions {
 
 //calcula o preço de um produto com base nas dimensões e materiais
 
-export const calculateProductPrice = async (productId: string, dimensions: Dimensions) => {
+export const calculateProductPrice = async (productId: string, dimensions: Dimensions, next: NextFunction) => {
   // Busca o produto com os materiais populados
   const product = await Product.findById(productId).populate('components.material');
-  if (!product) throw new Error('Produto não encontrado');
+  if (!product) return next(new app_error_class('Produto não encontrado', 404));
 
   //Valida as dimensões
   if (dimensions.height < product.constraints.minHeight || dimensions.height > product.constraints.maxHeight) {
-    throw new Error(`Altura inválida. Mínimo: ${product.constraints.minHeight}, Máximo: ${product.constraints.maxHeight}`);
+    return next(new app_error_class(`Altura inválida. Mínimo: ${product.constraints.minHeight}, Máximo: ${product.constraints.maxHeight}`, 400));
   };
   if (dimensions.width < product.constraints.minWidth || dimensions.width > product.constraints.maxWidth) {
-    throw new Error(`Largura inválida. Mínimo: ${product.constraints.minWidth}, Máximo: ${product.constraints.maxWidth}`);
+    return next(new app_error_class(`Largura inválida. Mínimo: ${product.constraints.minWidth}, Máximo: ${product.constraints.maxWidth}`, 400));
   };
   if (dimensions.depth < product.constraints.minDepth || dimensions.depth > product.constraints.maxDepth) {
-    throw new Error(`Profundidade inválida. Mínimo: ${product.constraints.minDepth}, Máximo: ${product.constraints.maxDepth}`);
+    return next(new app_error_class(`Profundidade inválida. Mínimo: ${product.constraints.minDepth}, Máximo: ${product.constraints.maxDepth}`, 400));
   };
 
   //calcula o custo dos materiais
