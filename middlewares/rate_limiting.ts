@@ -12,7 +12,7 @@ const Limiter = rateLimit({
 })
 
 const limiterLogin = rateLimit({
-  windowMs: 5 * 10 * 1000, // 15 minutos
+  windowMs: 5 * 10 * 1000, // 50 segundos
   max: 5,
   message: 'Muitas tentativas de login, por favor tente novamente mais tarde.',
   handler: (req:Request, res: Response, next: NextFunction) => {

@@ -196,11 +196,16 @@ export const delete_product = async (req: Request, res: Response, next: NextFunc
 
     const validation = dimensionsSchema.safeParse(req.body);
     if (!validation.success){
-      return next(new app_error_class('Dados inválidos para cálculo de preço', 400));
+      const flatenned = validation.error.flatten();
+      return res.status(400).json({
+        success: false,
+        message: 'Dados inválidos para cálculo de preço',
+        errors: flatenned.fieldErrors
+      });
     }
 
     try {
-      const quote = await calculateProductPrice(productId, validation.data);
+      const quote = await calculateProductPrice (productId, validation.data);
       res.json(quote);
     } catch (err) {
       return next(err);

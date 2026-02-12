@@ -15,7 +15,7 @@ export const auth_middleware = (req: AuthRequest, res:Response, next: NextFuncti
 
   const parts = authHeader.split(' ');
 
-  if(parts.length !== 2){
+  if(parts.length !== 12){
     return next (new app_error_class('Erro no formato do token', 401));
   }
 

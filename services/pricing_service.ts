@@ -1,5 +1,4 @@
 import Product from '../models/product_schema';
-import Material from '../models/material_schema';
 import { NextFunction } from 'express';
 import { app_error_class } from '../middlewares/error_handling_middleware';
 
@@ -11,20 +10,26 @@ interface Dimensions {
 
 //calcula o preço de um produto com base nas dimensões e materiais
 
-export const calculateProductPrice = async (productId: string, dimensions: Dimensions, next: NextFunction) => {
-  // Busca o produto com os materiais populados
+export const calculateProductPrice = async (productId: string, dimensions: Dimensions, next?: NextFunction) => {
+ try {// Busca o produto com os materiais populados
+ 
+  
   const product = await Product.findById(productId).populate('components.material');
-  if (!product) return next(new app_error_class('Produto não encontrado', 404));
+  if (!product){
+    const err = new app_error_class('Produto não encontrado', 404);
+    if(next) return next(err);
+    throw err;
+  }
 
   //Valida as dimensões
   if (dimensions.height < product.constraints.minHeight || dimensions.height > product.constraints.maxHeight) {
-    return next(new app_error_class(`Altura inválida. Mínimo: ${product.constraints.minHeight}, Máximo: ${product.constraints.maxHeight}`, 400));
+    return (new app_error_class(`Altura inválida. Mínimo: ${product.constraints.minHeight}, Máximo: ${product.constraints.maxHeight}`, 400));
   };
   if (dimensions.width < product.constraints.minWidth || dimensions.width > product.constraints.maxWidth) {
-    return next(new app_error_class(`Largura inválida. Mínimo: ${product.constraints.minWidth}, Máximo: ${product.constraints.maxWidth}`, 400));
+    return (new app_error_class(`Largura inválida. Mínimo: ${product.constraints.minWidth}, Máximo: ${product.constraints.maxWidth}`, 400));
   };
   if (dimensions.depth < product.constraints.minDepth || dimensions.depth > product.constraints.maxDepth) {
-    return next(new app_error_class(`Profundidade inválida. Mínimo: ${product.constraints.minDepth}, Máximo: ${product.constraints.maxDepth}`, 400));
+    return (new app_error_class(`Profundidade inválida. Mínimo: ${product.constraints.minDepth}, Máximo: ${product.constraints.maxDepth}`, 400));
   };
 
   //calcula o custo dos materiais
@@ -78,4 +83,7 @@ export const calculateProductPrice = async (productId: string, dimensions: Dimen
       technicalSheet
     }
     });
+  } catch (err) {
+    return(err);
+  }
 }
