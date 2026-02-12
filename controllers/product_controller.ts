@@ -6,11 +6,11 @@ import { app_error_class } from '../middlewares/error_handling_middleware';
 
 const productSchema = z.object({
   name: z
-    .string({ error : "O nome é obrigatório"})
+    .string({ error : "O nome Ã© obrigatÃ³rio"})
     .min(3, 'O nome deve conter pelo menos 3 caracteres'),
   description: z
-    .string({ error: "A descrição é obrigatória"})
-    .min(10, 'A descrição deve conter pelo menos 10 caracteres'),
+    .string({ error: "A descriÃ§Ã£o Ã© obrigatÃ³ria"})
+    .min(10, 'A descriÃ§Ã£o deve conter pelo menos 10 caracteres'),
   photos: z
     .array(z.string().url())
     .optional(),
@@ -20,47 +20,47 @@ const productSchema = z.object({
   constraints: z.object({
     minHeight: z
       .coerce
-      .number({error: "A Altura mínima é obrigatória"})
-      .positive('A altura mínima deve ser um número positivo'),
+      .number({error: "A Altura mÃ­nima Ã© obrigatÃ³ria"})
+      .positive('A altura mÃ­nima deve ser um nÃºmero positivo'),
     maxHeight: z
       .coerce
-      .number({error: "A Altura máxima é obrigatória"})
-      .positive('A altura máxima deve ser um número positivo'),
+      .number({error: "A Altura mÃ¡xima Ã© obrigatÃ³ria"})
+      .positive('A altura mÃ¡xima deve ser um nÃºmero positivo'),
     minWidth: z
       .coerce
-      .number({error: "A largura mínima é obrigatória"})
-      .positive('A largura mínima deve ser um número positivo'),
+      .number({error: "A largura mÃ­nima Ã© obrigatÃ³ria"})
+      .positive('A largura mÃ­nima deve ser um nÃºmero positivo'),
     maxWidth: z
       .coerce
-      .number({error: "A largura máxima é obrigatória"})
-      .positive('A largura máxima deve ser um número positivo'),
+      .number({error: "A largura mÃ¡xima Ã© obrigatÃ³ria"})
+      .positive('A largura mÃ¡xima deve ser um nÃºmero positivo'),
     minDepth: z
       .coerce
-      .number({error: "A profundidade mínima é obrigatória"})
-      .positive('A profundidade mínima deve ser um número positivo'),
+      .number({error: "A profundidade mÃ­nima Ã© obrigatÃ³ria"})
+      .positive('A profundidade mÃ­nima deve ser um nÃºmero positivo'),
     maxDepth: z
       .coerce
-      .number({error: "A profundidade máxima é obrigatória"})
-      .positive('A profundidade máxima deve ser um número positivo'),
+      .number({error: "A profundidade mÃ¡xima Ã© obrigatÃ³ria"})
+      .positive('A profundidade mÃ¡xima deve ser um nÃºmero positivo'),
   }),
   components: z.array(z.object({
     material: z
       .string()
-      .uuid('ID do material inválido'),
+      .uuid('ID do material invÃ¡lido'),
     quantityType: z
       .enum(['fixed', 'area_based', 'perimeter_based']),
     quantityFactor: z
       .number()
-      .positive('O fator de quantidade deve ser um número positivo'),
+      .positive('O fator de quantidade deve ser um nÃºmero positivo'),
   })),
   baseLaborCost: z
     .coerce
-    .number({error: "O custo da mão de obra base é obrigatório"})
-    .positive('O custo da mão de obra base deve ser um número positivo'),
+    .number({error: "O custo da mÃ£o de obra base Ã© obrigatÃ³rio"})
+    .positive('O custo da mÃ£o de obra base deve ser um nÃºmero positivo'),
   profitMargin: z
     .coerce
     .number()
-    .positive('A margem de lucro deve ser um número positivo'),
+    .positive('A margem de lucro deve ser um nÃºmero positivo'),
 })
 
 // Get all products
@@ -77,7 +77,7 @@ export const get_product_by_id = async (req: Request, res: Response, next: NextF
   try {
     const product = await Product.findById(req.params.id);
     if (!product){
-      return next(new app_error_class('Produto não encontrado', 404));
+      return next(new app_error_class('Produto nÃ£o encontrado', 404));
     }
     res.json(product);
   }catch (err) {
@@ -99,7 +99,7 @@ export const create_product = async (req: Request, res: Response, next: NextFunc
     const flatenned = resultado.error.flatten();
       return res.status(400).json({
         success: false,
-        message: 'Dados inválidos para criação de material',
+        message: 'Dados invÃ¡lidos para criaÃ§Ã£o de material',
         errors: flatenned.fieldErrors
       });
     }
@@ -136,20 +136,20 @@ export const update_product = async (req: Request, res: Response, next: NextFunc
       const flatenned = validation.error.flatten();
       return res.status(400).json({
         success: false,
-        message: 'Dados inválidos para atualização de produto',
+        message: 'Dados invÃ¡lidos para atualizaÃ§Ã£o de produto',
         errors: flatenned.fieldErrors
       });
     }
   
     //Valida ID busca e atualiza em tempo real 
-    // O { new: true } diz ao Mongoose para retornar o objeto JÁ atualizado, não o antigo.
+    // O { new: true } diz ao Mongoose para retornar o objeto JÃ atualizado, nÃ£o o antigo.
     const updateProduct = await Product.findByIdAndUpdate(
       req.params.id,
       {$set: validation.data},
       {new: true, runValidators: true} // runValidators garante que as regras do Schema (ex: min length) sejam respeitadas
     );
     if (updateProduct == null){
-      return next(new app_error_class('Produto não encontrado', 404));
+      return next(new app_error_class('Produto nÃ£o encontrado', 404));
     }
     res.json(updateProduct);
   } catch (err){
@@ -164,7 +164,7 @@ export const delete_product = async (req: Request, res: Response, next: NextFunc
     try {
       const product = await Product.findByIdAndDelete(req.params.id);
       if (product == null){
-        return next(new app_error_class('Produto não encontrado', 404));
+        return next(new app_error_class('Produto nÃ£o encontrado', 404));
       }  else {
         res.json({message: 'Produto deletado com sucesso'});
       }
@@ -177,21 +177,21 @@ export const delete_product = async (req: Request, res: Response, next: NextFunc
     export const get_product_quote = async (req: Request, res: Response, next: NextFunction) => {
     const productId = req.params.id;
 
-    //zod para validar dimensões enviadas pelo cliente
+    //zod para validar dimensÃµes enviadas pelo cliente
 
     const dimensionsSchema = z.object({
       height: z
       .coerce
-      .number({error: "A altura é obrigatória"})
-      .positive('A altura deve ser um número positivo'),
+      .number({error: "A altura Ã© obrigatÃ³ria"})
+      .positive('A altura deve ser um nÃºmero positivo'),
       width: z
       .coerce
-      .number({error: "A largura é obrigatória"})
-      .positive('A largura deve ser um número positivo'),
+      .number({error: "A largura Ã© obrigatÃ³ria"})
+      .positive('A largura deve ser um nÃºmero positivo'),
       depth: z
       .coerce
-      .number({error: "A profundidade é obrigatória"})
-      .positive('A profundidade deve ser um número positivo'),
+      .number({error: "A profundidade Ã© obrigatÃ³ria"})
+      .positive('A profundidade deve ser um nÃºmero positivo'),
     });
 
     const validation = dimensionsSchema.safeParse(req.body);
@@ -199,7 +199,7 @@ export const delete_product = async (req: Request, res: Response, next: NextFunc
       const flatenned = validation.error.flatten();
       return res.status(400).json({
         success: false,
-        message: 'Dados inválidos para cálculo de preço',
+        message: 'Dados invÃ¡lidos para cÃ¡lculo de preÃ§o',
         errors: flatenned.fieldErrors
       });
     }
