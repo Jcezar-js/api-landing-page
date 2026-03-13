@@ -10,12 +10,12 @@ export interface AuthRequest extends Request {
 export const auth_middleware = (req: AuthRequest, res:Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if(!authHeader){
-    return next (new app_error_class('Token de autenticação não fornecido', 401));
+    return next (new app_error_class('Token de autenticaï¿½ï¿½o nï¿½o fornecido', 401));
   }
 
   const parts = authHeader.split(' ');
 
-  if(parts.length !== 12){
+  if(parts.length !== 2){
     return next (new app_error_class('Erro no formato do token', 401));
   }
 
@@ -33,6 +33,6 @@ export const auth_middleware = (req: AuthRequest, res:Response, next: NextFuncti
 
     return next();
   } catch (err){
-    return next (new app_error_class('Token inválido', 401));
+    return next (new app_error_class('Token invï¿½lido', 401));
   }
 };
