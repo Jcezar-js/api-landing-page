@@ -4,4 +4,5 @@ node_modules
 .cursor/workspace.code-workspace
 .cursor/rules/Rebuilt.mdc
 .CHANGELOG.md
+.vscode
 
