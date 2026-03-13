@@ -9,19 +9,19 @@ import { app_error_class } from '../middlewares/error_handling_middleware';
 //user validation schema zod
 const userSchema = z.object({
   name: z
-    .string({ error: "O nome é obrigatório" })
+    .string({ error: "O nome ï¿½ obrigatï¿½rio" })
     .min(3, 'O nome deve conter pelo menos 3 caracteres'),
   email: z
     .string()
-    .min(1, { message: 'O campo "Email" é obrigatório' })
-    .email("Formato de email inválido"),
+    .min(1, { message: 'O campo "Email" ï¿½ obrigatï¿½rio' })
+    .email("Formato de email invï¿½lido"),
   password: z
-    .string({ error: "A senha é obrigatória" })
-    .min(8, { message: 'A senha deve conter no mínimo 8 caracteres' })
-    .max(32, { message: 'A senha deve conter no máximo 32 caracteres' })
-    .refine((password) => /[A-Z]/.test(password), { message: 'A senha deve conter pelo menos uma letra maiúscula' })
-    .refine((password) => /[a-z]/.test(password), { message: 'A senha deve conter pelo menos uma letra minúscula' })
-    .refine((password) => /[0-9]/.test(password), { message: 'A senha deve conter pelo menos um número' })
+    .string({ error: "A senha ï¿½ obrigatï¿½ria" })
+    .min(8, { message: 'A senha deve conter no mï¿½nimo 8 caracteres' })
+    .max(32, { message: 'A senha deve conter no mï¿½ximo 32 caracteres' })
+    .refine((password) => /[A-Z]/.test(password), { message: 'A senha deve conter pelo menos uma letra maiï¿½scula' })
+    .refine((password) => /[a-z]/.test(password), { message: 'A senha deve conter pelo menos uma letra minï¿½scula' })
+    .refine((password) => /[0-9]/.test(password), { message: 'A senha deve conter pelo menos um nï¿½mero' })
     .refine((password) => /[!@#$%^&*(),.?":{}|<>]/.test(password), { message: 'A senha deve conter pelo menos um caractere especial' }),
 })
 
@@ -40,7 +40,7 @@ export const create_user = async (req: Request, res: Response, next: NextFunctio
     const flatenned = result.error.flatten();
     return res.status(400).json({
       success: false,
-      message: 'Dados inválidos para criação de usuário',
+      message: 'Dados invï¿½lidos para criaï¿½ï¿½o de usuï¿½rio',
       errors: flatenned.fieldErrors
     });
   }
@@ -51,7 +51,7 @@ export const create_user = async (req: Request, res: Response, next: NextFunctio
     res.status(201).json({ _id: user._id, name: user.name, email: user.email });
   } catch (err: any) {
     if (err.code === 11000) {
-      return next(new app_error_class('Email já cadastrado', 409));
+      return next(new app_error_class('Email jï¿½ cadastrado', 409));
     }
   }
 
@@ -63,7 +63,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const flatenned = validation.error.flatten();
     return res.status(400).json({
       success: false,
-      message: 'Dados inválidos para login',
+      message: 'Dados invï¿½lidos para login',
       errors: flatenned.fieldErrors
     });
   }
@@ -82,7 +82,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      return next(new app_error_class('JWT_SECRET não está definido', 422));
+      return next(new app_error_class('JWT_SECRET nï¿½o estï¿½ definido', 422));
     }
 
     const token = jwt.sign(
@@ -103,12 +103,15 @@ export const update_password = async (req: Request, res: Response, next: NextFun
   const validation = updatePasswordSchema.safeParse(req.body);
   const userId = (req as any).userId;
 
+  if (userId !== req.params.id) {
+    return next(new app_error_class('Acesso nÃ£o autorizado', 403));
+  }
 
   if (!validation.success) {
     const flatenet = validation.error.flatten();
     return res.status(400).json({
       success: false,
-      message: 'Dados inválidos para atualização de senha',
+      message: 'Dados invï¿½lidos para atualizaï¿½ï¿½o de senha',
       errors: flatenet.fieldErrors
     });
   }
@@ -118,16 +121,16 @@ export const update_password = async (req: Request, res: Response, next: NextFun
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return next(new app_error_class('Usuário não encontrado', 404));
+      return next(new app_error_class('Usuï¿½rio nï¿½o encontrado', 404));
     }
 
     const isSameAsOldPassword = await bcrypt.compare(newPassword, user.password);
     if (isSameAsOldPassword) {
-      return next(new app_error_class('A nova senha não pode ser igual a senha atual', 400));
+      return next(new app_error_class('A nova senha nï¿½o pode ser igual a senha atual', 400));
     }
 
     if (newPassword !== confirmPassword) {
-      return next(new app_error_class('A senha de confirmação não corresponde à nova senha', 400));
+      return next(new app_error_class('A senha de confirmaï¿½ï¿½o nï¿½o corresponde ï¿½ nova senha', 400));
     };
 
     user.password = newPassword;

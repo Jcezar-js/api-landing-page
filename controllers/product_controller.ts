@@ -88,24 +88,27 @@ export const get_product_by_id = async (req: Request, res: Response, next: NextF
 export const create_product = async (req: Request, res: Response, next: NextFunction) => {
   const files = req.files as Express.Multer.File[] | undefined;
   const cloudfrontUrl = process.env.CLOUDFRONT_URL;
+  
+  if (!cloudfrontUrl) {
+    return next(new app_error_class('CLOUDFRONT_URL não configurada', 500));
+  }
+  
   const newPhotos = files?.map(file => `${cloudfrontUrl}/${(file as any).key}`) || [];
   const dataToValidate = {
     ...req.body,
     photos: newPhotos
   }
 
-
   const resultado = productSchema.safeParse(dataToValidate);
   if (!resultado.success) {
     const flatenned = resultado.error.flatten();
       return res.status(400).json({
         success: false,
-        message: 'Dados inv�lidos para cria��o de material',
+        message: 'Dados inválidos para criação de material',
         errors: flatenned.fieldErrors
       });
     }
 
-  
   const {name, description, photos, isFeatured} = resultado.data;
   const product = new Product({
     name,
@@ -119,9 +122,9 @@ export const create_product = async (req: Request, res: Response, next: NextFunc
   });
 
   try {
-    const newProduct =  await product.save();
+    const newProduct = await product.save();
     res.status(201).json(newProduct);
-  } catch (err){
+  } catch (err) {
     return next(err);
   }
 }
